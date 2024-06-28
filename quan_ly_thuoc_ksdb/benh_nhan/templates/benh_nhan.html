@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách bệnh nhân</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Danh sách bệnh nhân</h2>
+        
+        <!-- Form tìm kiếm -->
+        <form method="GET" action="" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="ma_benh_nhan" placeholder="Mã bệnh nhân" value="{{ request.GET.ma_benh_nhan }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="ho_ten" placeholder="Họ tên" value="{{ request.GET.ho_ten }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control" name="ngay_sinh" placeholder="Ngày sinh" value="{{ request.GET.ngay_sinh }}">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" name="khoa">
+                    <option value="">--- Chọn Khoa ---</option>
+                    {% for choice_key, choice_value in form.khoa.field.choices %}
+                    <option value="{{ choice_key }}" {% if choice_key == request.GET.khoa %}selected{% endif %}>{{ choice_value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </form>
+
+        <!-- Nút thêm bệnh nhân -->
+        <div class="mb-4 text-end">
+            <a href="{% url 'them_benh_nhan' %}" class="btn btn-success">Thêm bệnh nhân</a>
+        </div>
+
+        <!-- Danh sách bệnh nhân -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã bệnh nhân</th>
+                    <th>Họ tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Khoa</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bn in benh_nhans %}
+                <tr>
+                    <td>{{ bn.ma_benh_nhan }}</td>
+                    <td>{{ bn.ho_ten }}</td>
+                    <td class='text_center'>{{ bn.ngay_sinh }}</td>
+                    <td>{{ bn.get_khoa_display }}</td>
+                    <td>
+                        <a href="{% url 'sua_benh_nhan' bn.id %}" class="btn btn-info btn-md">Sửa</a>
+                        <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md">Xoá</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Không có bệnh nhân nào được tìm thấy.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body>
+</html>
