@@ -11,6 +11,7 @@ def danh_sach_benh_nhan(request):
     khoa = request.GET.get('khoa', '')
 
     # Lọc dữ liệu theo các tham số tìm kiếm nếu có
+    form = BenhNhanForm()
     benh_nhans = BenhNhan.objects.all()
     if ma_benh_nhan:
         benh_nhans = benh_nhans.filter(ma_benh_nhan__icontains=ma_benh_nhan)
@@ -21,7 +22,7 @@ def danh_sach_benh_nhan(request):
     if khoa:
         benh_nhans = benh_nhans.filter(khoa=khoa)
 
-    return render(request, 'benh_nhan.html', {'benh_nhans': benh_nhans})
+    return render(request, 'benh_nhan.html', {'benh_nhans': benh_nhans, 'form' : form})
 
 def them_benh_nhan(request):
     if request.method == 'POST':

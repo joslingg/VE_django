@@ -7,7 +7,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        
+        /* Thêm các styles tùy chỉnh của bạn nếu cần */
     </style>
 </head>
 <body>
@@ -40,7 +40,9 @@
 
         <!-- Nút thêm bệnh nhân -->
         <div class="mb-4 text-end">
-            <a href="{% url 'them_benh_nhan' %}" class="btn btn-success">Thêm bệnh nhân</a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#themBenhNhanModal">
+                Thêm bệnh nhân
+            </button>
         </div>
 
         <!-- Danh sách bệnh nhân -->
@@ -59,10 +61,10 @@
                 <tr>
                     <td>{{ bn.ma_benh_nhan }}</td>
                     <td>{{ bn.ho_ten }}</td>
-                    <td class='text_center'>{{ bn.ngay_sinh }}</td>
+                    <td class='text_center'>{{ bn.ngay_sinh|date:"d/m/Y" }}</td>
                     <td>{{ bn.get_khoa_display }}</td>
                     <td>
-                        <a href="{% url 'sua_benh_nhan' bn.id %}" class="btn btn-info btn-md">Sửa</a>
+                        <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaBenhNhanModal{{ bn.id }}">Sửa</button>
                         <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md">Xoá</a>
                     </td>
                 </tr>
@@ -74,6 +76,90 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Modal Thêm -->
+    <div class="modal fade" id="themBenhNhanModal" tabindex="-1" aria-labelledby="themBenhNhanModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="themBenhNhanModalLabel">Thêm bệnh nhân</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'them_benh_nhan' %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="ma_benh_nhan">Mã bệnh nhân</label>
+                            <input type="text" class="form-control {% if form.ma_benh_nhan.errors %}is-invalid{% endif %}" id="ma_benh_nhan" name="ma_benh_nhan" required>
+                            {% for error in form.ma_benh_nhan.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="ho_ten">Họ tên</label>
+                            <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="ngay_sinh">Ngày sinh</label>
+                            <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="khoa">Khoa</label>
+                            <select class="form-control" id="khoa" name="khoa">
+                                <option value="">--- Chọn Khoa ---</option>
+                                {% for choice_key, choice_value in form.fields.khoa.choices %}
+                                <option value="{{ choice_key }}">{{ choice_value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Thêm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sửa -->
+    {% for bn in benh_nhans %}
+    <div class="modal fade" id="suaBenhNhanModal{{ bn.id }}" tabindex="-1" aria-labelledby="suaBenhNhanModalLabel{{ bn.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="suaBenhNhanModalLabel{{ bn.id }}">Sửa bệnh nhân</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'sua_benh_nhan' bn.id %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="ma_benh_nhan">Mã bệnh nhân</label>
+                            <input type="text" class="form-control" id="ma_benh_nhan" name="ma_benh_nhan" value="{{ bn.ma_benh_nhan }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="ho_ten">Họ tên</label>
+                            <input type="text" class="form-control" id="ho_ten" name="ho_ten" value="{{ bn.ho_ten }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="ngay_sinh">Ngày sinh</label>
+                            <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" value="{{ bn.ngay_sinh }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="khoa">Khoa</label>
+                            <select class="form-control" id="khoa" name="khoa">
+                                <option value="">--- Chọn Khoa ---</option>
+                                {% for choice_key, choice_value in form.fields.khoa.choices %}
+                                <option value="{{ choice_key }}" {% if choice_key == bn.khoa %}selected{% endif %}>{{ choice_value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Lưu thay đổi</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
