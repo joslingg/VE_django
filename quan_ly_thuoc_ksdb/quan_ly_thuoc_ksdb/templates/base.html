@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <style type='text/css'>
+        /* Custom styles for the sidebar */
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            background-color: #198754;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            padding: 25px 15px;
+            text-align: left;
+            font-size: 18px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: #136941;
+            text-decoration: none;
+        }
+        .sidebar a.active {
+            background-color: #136941;
+            text-decoration: none;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .topbar {
+            background-color: #198754;
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            margin-left: 200px;
+            box-shadow: 0 2px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .topbar h3 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: bold;
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h3>HỆ THỐNG QUẢN LÝ DỰ TRÙ THUỐC</h3>
+    </div>
+
+    <div class="sidebar">
+        <center><img src="{% static 'logo.jpg' %}" class="responsive-img" style="max-height:100px;margin-bottom:10px" alt="Logo"></center>
+        <a href="{% url "danh_sach_benh_nhan" %}" class="{% if request.path == '/benh_nhan/' %}active{% endif %}">Quản lý bệnh nhân</a>
+        <a href="#">Dự trù thuốc</a>
+        <a href="#">Báo cáo/Thống kê</a>
+    </div>
+
+
+    <div class="content">
+        {% block content %}
+        <!-- Main content will be here -->
+        {% endblock %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+</body>
+</html>

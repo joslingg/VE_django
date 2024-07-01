@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
     <title>Đăng nhập</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg {
+            background-image: url("{% static 'bgimg.jpg' %}");
+            background-size: cover;
+        }
+    </style>
 </head>
-<body>
+<body class='bg'>
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center" style='margin-top:10px'>
             <div class="col-md-6">
                 <div class="card mt-5">
                     <div class="card-header text-center">
+                        <img src="{% static 'logo.jpg' %}" class="responsive-img" style="max-height:50px;margin-right:10px" alt="Logo">
                         <h3>Đăng nhập</h3>
                     </div>
                     <div class="card-body">
@@ -26,7 +34,7 @@
                                 <label for="password">Mật khẩu</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+                            <center><button type="submit" class="btn btn-primary btn-block">Đăng nhập</button></center>
                         </form>
                     </div>
                 </div>

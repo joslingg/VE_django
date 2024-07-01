@@ -1,168 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách bệnh nhân</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Thêm các styles tùy chỉnh của bạn nếu cần */
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <h2 class="text-center">Danh sách bệnh nhân</h2>
-        
-        <!-- Form tìm kiếm -->
-        <form method="GET" action="" class="row g-3 mb-4">
-            <div class="col-md-3">
-                <input type="text" class="form-control" name="ma_benh_nhan" placeholder="Mã bệnh nhân" value="{{ request.GET.ma_benh_nhan }}">
-            </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" name="ho_ten" placeholder="Họ tên" value="{{ request.GET.ho_ten }}">
-            </div>
-            <div class="col-md-3">
-                <input type="date" class="form-control" name="ngay_sinh" placeholder="Ngày sinh" value="{{ request.GET.ngay_sinh }}">
-            </div>
-            <div class="col-md-3">
-                <select class="form-control" name="khoa">
-                    <option value="">--- Chọn Khoa ---</option>
-                    {% for choice_key, choice_value in form.khoa.field.choices %}
-                    <option value="{{ choice_key }}" {% if choice_key == request.GET.khoa %}selected{% endif %}>{{ choice_value }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-            </div>
-        </form>
-
-        <!-- Nút thêm bệnh nhân -->
-        <div class="mb-4 text-end">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#themBenhNhanModal">
-                Thêm bệnh nhân
-            </button>
+{% extends "base.html" %}
+{% block title %}
+Quản lý bệnh nhân
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Danh sách bệnh nhân</h2>
+    
+    <!-- Form tìm kiếm -->
+    <form method="GET" action="" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="ma_benh_nhan" placeholder="Mã bệnh nhân" value="{{ request.GET.ma_benh_nhan }}">
         </div>
-
-        <!-- Danh sách bệnh nhân -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Mã bệnh nhân</th>
-                    <th>Họ tên</th>
-                    <th>Ngày sinh</th>
-                    <th>Khoa</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for bn in benh_nhans %}
-                <tr>
-                    <td>{{ bn.ma_benh_nhan }}</td>
-                    <td>{{ bn.ho_ten }}</td>
-                    <td class='text_center'>{{ bn.ngay_sinh|date:"d/m/Y" }}</td>
-                    <td>{{ bn.get_khoa_display }}</td>
-                    <td>
-                        <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaBenhNhanModal{{ bn.id }}">Sửa</button>
-                        <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md">Xoá</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">Không có bệnh nhân nào được tìm thấy.</td>
-                </tr>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="ho_ten" placeholder="Họ tên" value="{{ request.GET.ho_ten }}">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" name="ngay_sinh" placeholder="Ngày sinh" value="{{ request.GET.ngay_sinh }}">
+        </div>
+        <div class="col-md-3">
+            <select class="form-control" name="khoa">
+                <option value="">--- Chọn Khoa ---</option>
+                {% for choice_key, choice_value in form.khoa.field.choices %}
+                <option value="{{ choice_key }}" {% if choice_key == request.GET.khoa %}selected{% endif %}>{{ choice_value }}</option>
                 {% endfor %}
-            </tbody>
-        </table>
+            </select>
+        </div>
+        <div class="col-md-12 text-center">
+            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        </div>
+    </form>
+
+    <!-- Nút thêm bệnh nhân -->
+    <div class="mb-4 text-end">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#themBenhNhanModal">
+            Thêm bệnh nhân
+        </button>
     </div>
 
-    <!-- Modal Thêm -->
-    <div class="modal fade" id="themBenhNhanModal" tabindex="-1" aria-labelledby="themBenhNhanModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="themBenhNhanModalLabel">Thêm bệnh nhân</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="{% url 'them_benh_nhan' %}">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label for="ma_benh_nhan">Mã bệnh nhân</label>
-                            <input type="text" class="form-control {% if form.ma_benh_nhan.errors %}is-invalid{% endif %}" id="ma_benh_nhan" name="ma_benh_nhan" required>
-                            {% for error in form.ma_benh_nhan.errors %}
-                                <div class="invalid-feedback">{{ error }}</div>
+    <!-- Danh sách bệnh nhân -->
+    <table class="table table-bordered">
+        <thead>
+            <tr align='center'>
+                <th>Mã bệnh nhân</th>
+                <th>Họ tên</th>
+                <th>Ngày sinh</th>
+                <th>Khoa</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bn in benh_nhans %}
+            <tr>
+                <td align='center'>{{ bn.ma_benh_nhan }}</td>
+                <td>{{ bn.ho_ten }}</td>
+                <td align='center' class='text_center'>{{ bn.ngay_sinh|date:"d/m/Y" }}</td>
+                <td>{{ bn.get_khoa_display }}</td>
+                <td align='center'>
+                    <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaBenhNhanModal{{ bn.id }}">Sửa</button>
+                    <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md">Xoá</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Không có bệnh nhân nào được tìm thấy.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm -->
+<div class="modal fade" id="themBenhNhanModal" tabindex="-1" aria-labelledby="themBenhNhanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="themBenhNhanModalLabel">Thêm bệnh nhân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'them_benh_nhan' %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="ma_benh_nhan">Mã bệnh nhân</label>
+                        <input type="text" class="form-control {% if form.ma_benh_nhan.errors %}is-invalid{% endif %}" id="ma_benh_nhan" name="ma_benh_nhan" required>
+                        {% for error in form.ma_benh_nhan.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ho_ten">Họ tên</label>
+                        <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ngay_sinh">Ngày sinh</label>
+                        <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="khoa">Khoa</label>
+                        <select class="form-control" id="khoa" name="khoa">
+                            <option value="">--- Chọn Khoa ---</option>
+                            {% for choice_key, choice_value in form.fields.khoa.choices %}
+                            <option value="{{ choice_key }}">{{ choice_value }}</option>
                             {% endfor %}
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="ho_ten">Họ tên</label>
-                            <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="ngay_sinh">Ngày sinh</label>
-                            <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="khoa">Khoa</label>
-                            <select class="form-control" id="khoa" name="khoa">
-                                <option value="">--- Chọn Khoa ---</option>
-                                {% for choice_key, choice_value in form.fields.khoa.choices %}
-                                <option value="{{ choice_key }}">{{ choice_value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-block">Thêm</button>
-                    </form>
-                </div>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">Thêm</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal Sửa -->
-    {% for bn in benh_nhans %}
-    <div class="modal fade" id="suaBenhNhanModal{{ bn.id }}" tabindex="-1" aria-labelledby="suaBenhNhanModalLabel{{ bn.id }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="suaBenhNhanModalLabel{{ bn.id }}">Sửa bệnh nhân</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="{% url 'sua_benh_nhan' bn.id %}">
-                        {% csrf_token %}
-                        <div class="form-group mb-3">
-                            <label for="ma_benh_nhan">Mã bệnh nhân</label>
-                            <input type="text" class="form-control" id="ma_benh_nhan" name="ma_benh_nhan" value="{{ bn.ma_benh_nhan }}" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="ho_ten">Họ tên</label>
-                            <input type="text" class="form-control" id="ho_ten" name="ho_ten" value="{{ bn.ho_ten }}" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="ngay_sinh">Ngày sinh</label>
-                            <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" value="{{ bn.ngay_sinh }}" required>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="khoa">Khoa</label>
-                            <select class="form-control" id="khoa" name="khoa">
-                                <option value="">--- Chọn Khoa ---</option>
-                                {% for choice_key, choice_value in form.fields.khoa.choices %}
-                                <option value="{{ choice_key }}" {% if choice_key == bn.khoa %}selected{% endif %}>{{ choice_value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Lưu thay đổi</button>
-                    </form>
-                </div>
+<!-- Modal Sửa -->
+{% for bn in benh_nhans %}
+<div class="modal fade" id="suaBenhNhanModal{{ bn.id }}" tabindex="-1" aria-labelledby="suaBenhNhanModalLabel{{ bn.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suaBenhNhanModalLabel{{ bn.id }}">Sửa bệnh nhân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sua_benh_nhan' bn.id %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="ma_benh_nhan">Mã bệnh nhân</label>
+                        <input type="text" class="form-control" id="ma_benh_nhan" name="ma_benh_nhan" value="{{ bn.ma_benh_nhan }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ho_ten">Họ tên</label>
+                        <input type="text" class="form-control" id="ho_ten" name="ho_ten" value="{{ bn.ho_ten }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ngay_sinh">Ngày sinh</label>
+                        <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" value="{{ bn.ngay_sinh }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="khoa">Khoa</label>
+                        <select class="form-control" id="khoa" name="khoa">
+                            <option value="">--- Chọn Khoa ---</option>
+                            {% for choice_key, choice_value in form.fields.khoa.choices %}
+                            <option value="{{ choice_key }}" {% if choice_key == bn.khoa %}selected{% endif %}>{{ choice_value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Lưu thay đổi</button>
+                </form>
             </div>
         </div>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
-</body>
-</html>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+{% endblock %}
+    
