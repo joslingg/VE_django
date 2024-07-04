@@ -14,8 +14,9 @@
             top: 0;
             left: 0;
             width: 200px;
-            background-color: #198754;
+            background-color: #4c5951;
             padding-top: 20px;
+            margin-top: 30px;
         }
 
         .sidebar a {
@@ -28,11 +29,11 @@
         }
 
         .sidebar a:hover {
-            background-color: #136941;
+            background-color: #3e4641;
             text-decoration: none;
         }
         .sidebar a.active {
-            background-color: #136941;
+            background-color: #b3a6ae;
             text-decoration: none;
         }
 
@@ -50,25 +51,33 @@
             left: 0;
             width: 100%;
             z-index: 1000;
-            margin-left: 200px;
             box-shadow: 0 2px 0px rgba(0, 0, 0, 0.2);
         }
-
+        .topbar a{
+            text-decoration: none;
+            color: #fff;
+        }
+        .topbar a:hover{
+            text-decoration: none;
+            color: #e7ede6;
+        }
         .topbar h3 {
             margin: 0;
             font-size: 25px;
             font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="topbar">
-        <h3>HỆ THỐNG QUẢN LÝ DỰ TRÙ THUỐC</h3>
+        <a href="{% url "home" %}"><h3>HỆ THỐNG QUẢN LÝ DỰ TRÙ THUỐC</h3></a>
     </div>
 
     <div class="sidebar">
-        <center><img src="{% static 'logo.jpg' %}" class="responsive-img" style="max-height:100px;margin-bottom:10px" alt="Logo"></center>
         <a href="{% url "danh_sach_benh_nhan" %}" class="{% if request.path == '/benh_nhan/' %}active{% endif %}">Quản lý bệnh nhân</a>
         <a href="#">Dự trù thuốc</a>
+        <a href="{% url "danh_muc_thuoc" %}" class="{% if request.path == '/danh_muc_thuoc/' %}active{% endif %}">Danh mục thuốc</a>
+        <a href="{% url "kho" %}"class=" {% if request.path == '/kho/' %}active{% endif %}">Kho thuốc</a>
         <a href="#">Báo cáo/Thống kê</a>
     </div>
 
