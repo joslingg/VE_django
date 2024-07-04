@@ -77,7 +77,7 @@
         <a href="{% url "danh_sach_benh_nhan" %}" class="{% if request.path == '/benh_nhan/' %}active{% endif %}">Quản lý bệnh nhân</a>
         <a href="#">Dự trù thuốc</a>
         <a href="{% url "danh_muc_thuoc" %}" class="{% if request.path == '/danh_muc_thuoc/' %}active{% endif %}">Danh mục thuốc</a>
-        <a href="{% url "kho" %}"class=" {% if request.path == '/kho/' %}active{% endif %}">Kho thuốc</a>
+        <a href="{% url "danh_sach_kho" %}"class=" {% if request.path == '/danh_sach_kho/' %}active{% endif %}">Kho thuốc</a>
         <a href="#">Báo cáo/Thống kê</a>
     </div>
 
@@ -90,5 +90,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 </html>

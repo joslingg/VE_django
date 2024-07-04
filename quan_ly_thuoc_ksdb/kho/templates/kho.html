@@ -3,6 +3,7 @@
 {% block title %}Kho thuốc{% endblock title %}
 {% load humanize %}
 {% block content %}
+
 <div class="container mt-5">
     <h2 class="text-center">Kho thuốc</h2>
     <br>
@@ -28,22 +29,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for thuoc in thuoc %}
-            <tr>
-                <td align='center'>{{forloop.counter}}</td>
-                <td align='center'>{{ thuoc.ngay_nhap }}</td>
-                <td>{{ thuoc.ten_thuoc }}</td>
-                <td align='center'>{{thuoc.dvt}}</td>
-                <td align='center'>{{ thuoc.don_gia|floatformat:0|intcomma }}</td>
-                <td align='center'>{{thuoc.ton_dau}}</td>
-                <td align='center'>{{thuoc.nhap}}</td>
-                <td align='center'>{{thuoc.xuat}}</td>
-                <td align='center'>{{thuoc.ton_cuoi}}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="text-center">Không có thuốc nào trong kho.</td>
-            </tr>
+            {% for thuoc in items_thuoc %}
+                <tr>
+                    <td align='center'>{{forloop.counter}}</td>
+                    <td align='center'>{{ thuoc.ngay_nhap }}</td>
+                    <td>{{ thuoc.ten_thuoc }}</td>
+                    <td align='center'>{{thuoc_kho.dvt}}</td>
+                    <td align='center'>{{ thuoc.don_gia|floatformat:0|intcomma }}</td>
+                    <td align='center'>{{thuoc.ton_dau}}</td>
+                    <td align='center'>{{thuoc.nhap}}</td>
+                    <td align='center'>{{thuoc.xuat}}</td>
+                    <td align='center'>{{thuoc.ton_cuoi}}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">Không có thuốc nào trong kho.</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -59,21 +60,25 @@
                     <form method="POST" action="{% url 'nhap_thuoc' %}">
                         {% csrf_token %}
                         <div class="form-group mb-3">
+                            <label for="ngay_nhap">Ngày nhập</label>
+                            <input type="date" class="form-control" id="ngay_nhap" name="ngay_nhap" required>
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="ten_thuoc">Tên thuốc</label>
-                            <select class="form-control" id="ten_thuoc" name="ten_thuoc">
+                            <select class="form-control" id="ten_thuoc" name="thuoc">
                                 <option value="">--- Chọn thuốc ---</option>
-                                {% for thuoc in form.thuoc %}
-                                <option value="{{ thuoc.id }}">{{ thuoc.ten_thuoc }}</option>
+                                {% for thuoc in items_danh_muc %}
+                                    <option value="{{ thuoc.id }}">{{ thuoc.ten_thuoc }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="form-group mb-3">
                             <label for="dvt">ĐVT</label>
-                            <input type="text" class="form-control" id="dvt" name="dvt" required>
+                            <input readonly type="text" class="form-control" id="dvt" name="dvt">
                         </div>
                         <div class="form-group mb-3">
                             <label for="don_gia">Đơn giá</label>
-                            <input type="number" class="form-control" id="don_gia" name="don_gia" required>
+                            <input readonly  type="number" class="form-control" id="don_gia" name="don_gia">
                         </div>
                         <div class="form-group mb-3">
                             <label for="so_luong_nhap">Số lượng nhập</label>
@@ -82,10 +87,33 @@
 
                         <button type="submit" class="btn btn-primary btn-block">Thêm</button>
                     </form>
+                    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+                    <script>
+                        $(document).ready(function() {
+                            $('#ten_thuoc').change(function() {
+                                var thuocId = $(this).val();
+                                if (thuocId) {
+                                    $.ajax({
+                                        url: '{% url "lay_tt_thuoc" 0 %}'.replace('/0/', '/' + thuocId + '/'),
+                                        type: 'GET',
+                                        success: function(data) {
+                                            $('#dvt').val(data.dvt);
+                                            $('#don_gia').val(data.don_gia);
+                                        },
+                                        error: function(error) {
+                                            console.log(error);
+                                        }
+                                    });
+                                } else {
+                                    $('#dvt').val('');
+                                    $('#don_gia').val('');
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

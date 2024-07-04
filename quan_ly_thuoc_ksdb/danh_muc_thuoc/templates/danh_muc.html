@@ -12,7 +12,34 @@
             Thêm mới
         </button>
     </div>
-
+    <!--Thông báo!-->
+    {% if messages %}
+        <div class = "alert alert-success" id="message-alert">
+            <ul class = "mb-0">
+                {% for item in messages  %}
+                    <li>{{item}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <script>
+        // Chờ cho đến khi DOM được tải hoàn toàn
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tìm phần tử thông báo
+            var alert = document.getElementById("message-alert");
+            // Nếu tồn tại thông báo, thiết lập timeout để ẩn thông báo sau 3 giây
+            if (alert) {
+                setTimeout(function() {
+                    alert.style.transition = "opacity 0.5s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(function() {
+                        alert.style.display = "none";
+                    }, 500); // 500 milliseconds = 0.5 seconds
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+        });
+    </script>
+    
     <table class="table table-bordered">
         <thead>
             <tr align='center'>
@@ -24,15 +51,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for thuoc in thuoc %}
+            {% for thuoc in items_danh_muc %}
             <tr>
                 <td align='center'>{{forloop.counter}}</td>
                 <td>{{ thuoc.ten_thuoc }}</td>
                 <td align='center'>{{thuoc.dvt}}</td>
                 <td align='center'>{{ thuoc.don_gia|floatformat:0|intcomma }}</td>
                 <td align='center'>
-                    <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#{{ thuoc.id }}">Sửa</button>
-                    <a href="#" class="btn btn-danger btn-md">Xoá</a>
+                    <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaDanhMucModal{{ thuoc.id }}">Sửa</button>
+                    <a href="{% url 'xoa_danh_muc' thuoc.id %}" class="btn btn-danger btn-md" onclick="return confirm('Bạn có chắc muốn xoá thuốc này khỏi danh mục?')">Xoá</a>
                 </td>
             </tr>
             {% empty %}
@@ -75,7 +102,7 @@
 </div>
 
 <!-- Modal Sửa -->
-{% for thuoc in thuoc %}
+{% for thuoc in items_danh_muc %}
 <div class="modal fade" id="suaDanhMucModal{{ thuoc.id }}" tabindex="-1" aria-labelledby="suaDanhMucModalLabel{{ thuoc.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
