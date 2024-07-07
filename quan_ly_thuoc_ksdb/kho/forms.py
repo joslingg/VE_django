@@ -6,4 +6,4 @@ class KhoForm(forms.ModelForm):
     
     class Meta:
         model = Kho
-        fields = ['ngay_nhap','ten_thuoc','so_luong_nhap']
+        fields = ['thuoc']

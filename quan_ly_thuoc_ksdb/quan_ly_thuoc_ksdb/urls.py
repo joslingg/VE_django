@@ -25,4 +25,5 @@ urlpatterns = [
     path('benh_nhan/',include('benh_nhan.urls')),
     path('danh_sach_kho/',include('kho.urls')),
     path('danh_muc_thuoc/',include('danh_muc_thuoc.urls')),
+    path('danh_sach_phieu_nhap/',include('phieu_nhap_kho.urls')),
 ]

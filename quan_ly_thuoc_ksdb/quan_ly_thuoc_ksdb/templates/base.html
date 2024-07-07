@@ -5,91 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <title>{% block title %}{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
-    <style type='text/css'>
-        /* Custom styles for the sidebar */
-        .sidebar {
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 200px;
-            background-color: #4c5951;
-            padding-top: 20px;
-            margin-top: 30px;
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            padding: 25px 15px;
-            text-align: left;
-            font-size: 18px;
-            display: block;
-            color: #fff;
-        }
-
-        .sidebar a:hover {
-            background-color: #3e4641;
-            text-decoration: none;
-        }
-        .sidebar a.active {
-            background-color: #b3a6ae;
-            text-decoration: none;
-        }
-
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-
-        .topbar {
-            background-color: #198754;
-            color: #fff;
-            padding: 10px 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 2px 0px rgba(0, 0, 0, 0.2);
-        }
-        .topbar a{
-            text-decoration: none;
-            color: #fff;
-        }
-        .topbar a:hover{
-            text-decoration: none;
-            color: #e7ede6;
-        }
-        .topbar h3 {
-            margin: 0;
-            font-size: 25px;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'base-style.css' %}">
 </head>
 <body>
     <div class="topbar">
-        <a href="{% url "home" %}"><h3>HỆ THỐNG QUẢN LÝ DỰ TRÙ THUỐC</h3></a>
+        <a href="{% url 'home' %}"><h3>HỆ THỐNG QUẢN LÝ DỰ TRÙ THUỐC</h3></a>
     </div>
+    <nav class="sidebar">
+        <ul class="list-unstyled componets">
+            <li>
+                <a href="#" >Dự trù thuốc</a>
+            </li>
+            <li>
+                <a class="{% if request.path == '/benh_nhan/' %}active{% endif %}" href="{% url 'danh_sach_benh_nhan' %}">Quản lý bệnh nhân</a>
+            </li>
+            <li class="active">
+                <a class="dropdown-toggle" href="#quanLyThuocSubMenu" data-toggle='collapse' aria-expanded='false'>Quản lý thuốc</a>
+                <ul class="collapse list-unstyled" id='quanLyThuocSubMenu'>
+                    <li><a class=" {% if request.path == '/danh_muc_thuoc/' %}active{% endif %}" href="{% url 'danh_muc_thuoc' %}">Danh mục thuốc</a></li>
+                    <li><a class=" {% if request.path == '/danh_sach_kho/' %}active{% endif %}" href="{% url 'danh_sach_kho' %}">Kho</a></li>
+                    <li><a class=" {% if request.path == '/phieu_nhap/' %}active{% endif %}" href="{% url "danh_sach_phieu_nhap" %}">Phiếu nhập</a></li>
+                    <li><a class=" {% if request.path == '/phieu_xuat/' %}active{% endif %}" href="#">Phiếu xuất</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#" >Báo cáo thống kê</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="content">
+                {% block content %}
+                <!-- Main content will be here -->
+                {% endblock %}
+            </div>
 
-    <div class="sidebar">
-        <a href="{% url "danh_sach_benh_nhan" %}" class="{% if request.path == '/benh_nhan/' %}active{% endif %}">Quản lý bệnh nhân</a>
-        <a href="#">Dự trù thuốc</a>
-        <a href="{% url "danh_muc_thuoc" %}" class="{% if request.path == '/danh_muc_thuoc/' %}active{% endif %}">Danh mục thuốc</a>
-        <a href="{% url "danh_sach_kho" %}"class=" {% if request.path == '/danh_sach_kho/' %}active{% endif %}">Kho thuốc</a>
-        <a href="#">Báo cáo/Thống kê</a>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <!-- Bootstrap JS -->
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+        </div>
     </div>
-
-
-    <div class="content">
-        {% block content %}
-        <!-- Main content will be here -->
-        {% endblock %}
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 </html>

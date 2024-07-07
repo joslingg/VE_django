@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'benh_nhan',
     'kho',
     'danh_muc_thuoc',
+    'phieu_nhap_kho',
 ]
 
 MIDDLEWARE = [
