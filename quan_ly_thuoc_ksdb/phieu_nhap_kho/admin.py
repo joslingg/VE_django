@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import PhieuNhap,ctPhieuNhap
 
-# Register your models here.
+admin.site.register(PhieuNhap)
+admin.site.register(ctPhieuNhap)
+
+

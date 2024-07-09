@@ -4,7 +4,7 @@ from datetime import date
 
 # Create your models here.
 class PhieuNhap(models.Model):
-    so_phieu_nhap = models.CharField(max_length=20, unique=True, blank=True)
+    so_phieu_nhap = models.CharField(max_length=20, blank=True)
     ngay_nhap = models.DateField()
 
 class ctPhieuNhap(models.Model):
