@@ -80,31 +80,19 @@ Quản lý bệnh nhân
             <div class="modal-body">
                 <form method="POST" action="{% url 'them_benh_nhan' %}">
                     {% csrf_token %}
-                    <div class="form-group mb-3">
-                        <label for="ma_benh_nhan">Mã bệnh nhân</label>
-                        <input type="text" class="form-control {% if form.ma_benh_nhan.errors %}is-invalid{% endif %}" id="ma_benh_nhan" name="ma_benh_nhan" required>
-                        {% for error in form.ma_benh_nhan.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="ho_ten">Họ tên</label>
-                        <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="ngay_sinh">Ngày sinh</label>
-                        <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="khoa">Khoa</label>
-                        <select class="form-control" id="khoa" name="khoa">
-                            <option value="">--- Chọn Khoa ---</option>
-                            {% for choice_key, choice_value in form.fields.khoa.choices %}
-                            <option value="{{ choice_key }}">{{ choice_value }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
+                    {% for field in form %}
+                        <div class="form-group mb-3">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in field.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                     <button type="submit" class="btn btn-primary btn-block">Thêm</button>
                 </form>
             </div>
@@ -134,7 +122,7 @@ Quản lý bệnh nhân
                     </div>
                     <div class="form-group mb-3">
                         <label for="ngay_sinh">Ngày sinh</label>
-                        <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" value="{{ bn.ngay_sinh }}" required>
+                        <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh" value="{{ bn.ngay_sinh|date:'Y-m-d' }}" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="khoa">Khoa</label>
@@ -152,7 +140,32 @@ Quản lý bệnh nhân
     </div>
 </div>
 {% endfor %}
-
+<script>
+    $(document).ready(function() {
+        $('#modalForm').on('submit', function(e) {
+            e.preventDefault(); // Ngăn không gửi form theo cách mặc định
+            
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        // Cập nhật nội dung modal hoặc hiển thị thông báo thành công
+                        $('#modalContent').html(response.html);
+                        $('#modal').modal('hide'); // Đóng modal nếu cần
+                    } else {
+                        // Hiển thị lỗi trong modal
+                        $('#modalContent').html(response.html);
+                    }
+                },
+                error: function() {
+                    alert('Đã có lỗi xảy ra.');
+                }
+            });
+        });
+    });
+</script
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>

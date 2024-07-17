@@ -1,5 +1,7 @@
 # views.py
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from .models import BenhNhan
 from .forms import BenhNhanForm
 
@@ -29,9 +31,23 @@ def them_benh_nhan(request):
         form = BenhNhanForm(request.POST)
         if form.is_valid():
             form.save()
+            if request.is_ajax():
+                # Render partial template for modal
+                html = render_to_string('modal_success.html', {'form': form})
+                return JsonResponse({'success': True, 'html': html})
             return redirect('danh_sach_benh_nhan')
+        else:
+            if request.is_ajax():
+                # Render partial template with form errors
+                html = render_to_string('modal_form.html', {'form': form})
+                return JsonResponse({'success': False, 'html': html})
     else:
         form = BenhNhanForm()
+
+    if request.is_ajax():
+        html = render_to_string('modal_form.html', {'form': form})
+        return JsonResponse({'html': html})
+
     return render(request, 'them_benh_nhan.html', {'form': form})
 
 def sua_benh_nhan(request, id):
@@ -40,15 +56,14 @@ def sua_benh_nhan(request, id):
         form = BenhNhanForm(request.POST, instance=benh_nhan)
         if form.is_valid():
             form.save()
-            return redirect('danh_sach_benh_nhan')
     else:
         form = BenhNhanForm(instance=benh_nhan)
-    return render(request, 'sua_benh_nhan.html', {'form': form})
+    return redirect('danh_sach_benh_nhan')
 
 def xoa_benh_nhan(request, id):
     benh_nhan = get_object_or_404(BenhNhan, id=id)
     if request.method == 'POST':
         benh_nhan.delete()
         return redirect('danh_sach_benh_nhan')
-    return render(request, 'xoa_benh_nhan.html', {'benh_nhan': benh_nhan})
+    
 

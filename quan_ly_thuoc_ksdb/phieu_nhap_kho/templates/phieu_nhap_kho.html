@@ -25,7 +25,7 @@
             </select>
         </div>
         <div class="col-md-4">
-            <select class="form-control" id="so_phieu_nhap" name="so_phieu_nhap">
+            <select class="form-control" id="filter_so_phieu_nhap" name="filter_so_phieu_nhap">
                 <option value="">--- Chọn Phiếu Nhập ---</option>
                 {% for phieu in items_phieu_nhap %}
                     <option value="{{ phieu.so_phieu_nhap }}">{{ phieu.so_phieu_nhap }}</option>
@@ -96,6 +96,10 @@
                     <td align='center'>{{ct_phieu_nhap.thuoc.dvt}}</td>
                     <td align='center'>{{ ct_phieu_nhap.thuoc.don_gia|floatformat:0|intcomma }}</td>
                     <td align='center'>{{ct_phieu_nhap.so_luong_nhap}}</td>
+                    <td align='center'>
+                        <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaCtPhieuNhapModal{{ ct_phieu_nhap.id }}">Sửa</button>
+                        <a href="{% url "xoa_ct_phieu_nhap" ct_phieu_nhap.id %}" class="btn btn-danger btn-md" onclick="return confirm('Bạn có chắc muốn xoá thuốc này khỏi phiếu nhập không?')">Xoá</a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -108,7 +112,58 @@
         <p>Không tìm thấy chi tiết phiếu nhập.</p>
     {% endif %}
 
-    <!-- Modal thêm -->
+<!-- Modal sửa -->
+{% for ct_phieu_nhap in items_ct_phieu_nhap %}
+<div class="modal fade" id="suaCtPhieuNhapModal{{ct_phieu_nhap.id}}" tabindex="-1" aria-labelledby="suaCtPhieuNhapLabel{{ct_phieu_nhap.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suaCtPhieuNhapModal{{ct_phieu_nhap.id}}">Phiếu nhập kho</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sua_ct_phieu_nhap' ct_phieu_nhap.id %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="so_phieu_nhap">Số phiếu nhập</label>
+                        <input type="text" class="form-control" id="so_phieu_nhap" name="so_phieu_nhap" value="{{ct_phieu_nhap.phieu_nhap.so_phieu_nhap}}" readonly>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ngay_nhap">Ngày nhập</label>
+                        <input readonly type="date" class="form-control" id="ngay_nhap" name="ngay_nhap" value="{{ct_phieu_nhap.phieu_nhap.ngay_nhap|date:"Y-m-d"}}" required>
+                    </div>
+                    <div id="drug-input-container">
+                        <div class="drug-input-group mb-3">
+                            <div class="form-group mb-3">
+                                <label for="ten_thuoc">Tên thuốc <span class="drug-number">1</span></label>
+                                <select class="form-control" id="ten_thuoc" name="ten_thuoc">
+                                    <option value="">--- Chọn thuốc ---</option>
+                                    {% for thuoc in items_danh_muc %}
+                                        <option value="{{ thuoc.id }}" {% if ct_phieu_nhap.thuoc.id == thuoc.id %}selected{% endif %}>{{ thuoc.ten_thuoc }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="so_luong_nhap">Số lượng nhập</label>
+                                <input type="number" class="form-control" id="so_luong_nhap" name="so_luong_nhap" value="{{ct_phieu_nhap.so_luong_nhap}}" required>
+                            </div>
+                            <button type="button" class="btn btn-danger remove-drug" style="display: none;">Xoá</button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-success" id="add-drug">
+                            <i class="fas fa-plus"></i> Thêm thuốc
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block mt-3">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal thêm -->
 <div class="modal fade" id="nhapKhoModal" tabindex="-1" aria-labelledby="nhapKhoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
