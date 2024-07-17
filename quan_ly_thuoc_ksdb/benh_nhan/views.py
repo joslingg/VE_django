@@ -2,6 +2,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
 from .models import BenhNhan
 from .forms import BenhNhanForm
 
@@ -26,30 +29,17 @@ def danh_sach_benh_nhan(request):
 
     return render(request, 'benh_nhan.html', {'benh_nhans': benh_nhans, 'form' : form})
 
+@csrf_exempt
+@require_http_methods(["POST"])
 def them_benh_nhan(request):
-    if request.method == 'POST':
-        form = BenhNhanForm(request.POST)
-        if form.is_valid():
-            form.save()
-            if request.is_ajax():
-                # Render partial template for modal
-                html = render_to_string('modal_success.html', {'form': form})
-                return JsonResponse({'success': True, 'html': html})
-            return redirect('danh_sach_benh_nhan')
-        else:
-            if request.is_ajax():
-                # Render partial template with form errors
-                html = render_to_string('modal_form.html', {'form': form})
-                return JsonResponse({'success': False, 'html': html})
+    data = json.loads(request.body)
+    form = BenhNhanForm(data)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'success': True})
     else:
-        form = BenhNhanForm()
-
-    if request.is_ajax():
-        html = render_to_string('modal_form.html', {'form': form})
-        return JsonResponse({'html': html})
-
-    return render(request, 'them_benh_nhan.html', {'form': form})
-
+        return JsonResponse({'success': False, 'errors': form.errors})
+    
 def sua_benh_nhan(request, id):
     benh_nhan = get_object_or_404(BenhNhan, id=id)
     if request.method == 'POST':

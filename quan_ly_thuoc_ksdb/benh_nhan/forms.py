@@ -1,5 +1,6 @@
 from django import forms
 from .models import BenhNhan
+from django.core.exceptions import ValidationError
 
 class BenhNhanForm(forms.ModelForm):
     class Meta:
@@ -20,16 +21,16 @@ class BenhNhanForm(forms.ModelForm):
 
     def clean_ma_benh_nhan(self):
         ma_benh_nhan = self.cleaned_data.get('ma_benh_nhan')
-        if BenhNhan.objects.filter(ma_benh_nhan=ma_benh_nhan).exists():
-            raise forms.ValidationError("Mã bệnh nhân đã tồn tại.")
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            # Đang cập nhật bệnh nhân hiện có
+            if BenhNhan.objects.exclude(pk=instance.pk).filter(ma_benh_nhan=ma_benh_nhan).exists():
+                raise ValidationError("Mã bệnh nhân này đã tồn tại trong hệ thống.")
+        else:
+            # Đang tạo bệnh nhân mới
+            if BenhNhan.objects.filter(ma_benh_nhan=ma_benh_nhan).exists():
+                raise ValidationError("Mã bệnh nhân này đã tồn tại trong hệ thống.")
         return ma_benh_nhan
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control'})
-            if self.errors.get(name):
-                field.widget.attrs.update({'class': 'form-control is-invalid'})
 
 class TimKiemBenhNhanForm(forms.Form):
     ma_benh_nhan = forms.CharField(

@@ -78,19 +78,13 @@ Quản lý bệnh nhân
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{% url 'them_benh_nhan' %}">
+                <form method="POST" action="{% url 'them_benh_nhan' %}" id="themBenhNhanForm">
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="form-group mb-3">
                             {{ field.label_tag }}
                             {{ field }}
-                            {% if field.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in field.errors %}
-                                        <p>{{ error }}</p>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            <div class="invalid-feedback"></div>
                         </div>
                     {% endfor %}
                     <button type="submit" class="btn btn-primary btn-block">Thêm</button>
@@ -142,30 +136,38 @@ Quản lý bệnh nhân
 {% endfor %}
 <script>
     $(document).ready(function() {
-        $('#modalForm').on('submit', function(e) {
-            e.preventDefault(); // Ngăn không gửi form theo cách mặc định
+        $('#themBenhNhanForm').on('submit', function(e) {
+            e.preventDefault();
             
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
-                data: $(this).serialize(),
+                data: JSON.stringify($(this).serializeArray().reduce(function(a, x) { a[x.name] = x.value; return a; }, {})),
+                contentType: 'application/json',
+                dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        // Cập nhật nội dung modal hoặc hiển thị thông báo thành công
-                        $('#modalContent').html(response.html);
-                        $('#modal').modal('hide'); // Đóng modal nếu cần
+                        $('#themBenhNhanModal').modal('hide');
+                        location.reload();
                     } else {
-                        // Hiển thị lỗi trong modal
-                        $('#modalContent').html(response.html);
+                        // Hiển thị lỗi
+                        $('.invalid-feedback').empty(); // Xóa các lỗi cũ
+                        $('.is-invalid').removeClass('is-invalid');
+                        
+                        for (var field in response.errors) {
+                            $('#id_' + field).addClass('is-invalid');
+                            $('#id_' + field).siblings('.invalid-feedback').html(response.errors[field].join('<br>'));
+                        }
                     }
                 },
-                error: function() {
-                    alert('Đã có lỗi xảy ra.');
+                error: function(xhr, status, error) {
+                    console.log(xhr.responseText);
+                    alert('Đã có lỗi xảy ra: ' + error);
                 }
             });
         });
     });
-</script
+</script>
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
