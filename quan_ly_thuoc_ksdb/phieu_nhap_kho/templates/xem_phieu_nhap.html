@@ -1,0 +1,50 @@
+<!-- Modal xem -->
+{% for phieu_nhap in items_phieu_nhap %}
+<div class="modal fade" id="xemPhieuNhapModal{{ phieu_nhap.id }}" tabindex="-1" aria-labelledby="xemPhieuNhapLabel{{ phieu_nhap.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="xemPhieuNhapModal{{ phieu_nhap.id }}">Xem phiếu nhập kho</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class='table table-borderless'>
+                    <tr>
+                        <td>Số phiếu nhập: </td>
+                        <td>{{ phieu_nhap.so_phieu_nhap }}</td>
+                    </tr>
+                    <tr>
+                        <td>Ngày nhập: </td>
+                        <td>{{ phieu_nhap.ngay_nhap|date:"d/m/Y" }}</td>
+                    </tr>
+                </table>
+                <table class='table table-bordered'>
+                    <thead>
+                        <tr style='vertical-align: middle' align='center'>
+                            <th>STT</th>
+                            <th>Thuốc</th>
+                            <th>Số lượng nhập</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ct_phieu_nhap in items_ct_phieu_nhap %}
+                        {% if ct_phieu_nhap.phieu_nhap.so_phieu_nhap == phieu_nhap.so_phieu_nhap %}
+                            <tr>
+                                <td align='center'>{{ forloop.counter }}</td>
+                                <td align='center'>{{ ct_phieu_nhap.thuoc.ten_thuoc }}</td>
+                                <td align='center'>{{ ct_phieu_nhap.so_luong_nhap }}</td>
+                            </tr>
+                        {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" align="center">Không có dữ liệu</td>
+                            </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary btn-block mt-3" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

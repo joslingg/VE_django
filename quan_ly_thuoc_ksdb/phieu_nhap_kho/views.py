@@ -10,17 +10,15 @@ from django.db.models import Count, IntegerField
 from .forms import NhapThuocForm
 
 def danh_sach_phieu_nhap(request):
-    items_danh_muc = Thuoc.objects.all()
-    items_ct_phieu_nhap = ctPhieuNhap.objects.none()  # Khởi tạo biến rỗng
-    so_phieu_nhap = request.GET.get('filter_so_phieu_nhap')
-    print(f"Received so_phieu_nhap: {so_phieu_nhap}")  # In giá trị để kiểm tra
     months = range(1,13)
     current_year = datetime.now().year
     years = range(2023, current_year+1)
     thang = request.GET.get('thang')
     nam = request.GET.get('nam')
+    items_danh_muc = Thuoc.objects.all()
     items_phieu_nhap = PhieuNhap.objects.all()
-    
+    items_ct_phieu_nhap = ctPhieuNhap.objects.all()
+ 
     form = NhapThuocForm()
     
     if thang and nam:
@@ -28,26 +26,20 @@ def danh_sach_phieu_nhap(request):
             ngay_nhap_thang=ExtractMonth('ngay_nhap', output_field=IntegerField()),
             ngay_nhap_nam=ExtractYear('ngay_nhap')
         ).filter(ngay_nhap_thang=thang, ngay_nhap_nam=nam)
-            
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        phieu_list = list(items_phieu_nhap.values('id', 'so_phieu_nhap'))
-        return JsonResponse({'phieu_list': phieu_list})
-    
-    if so_phieu_nhap:
-        # Lọc chi tiết phiếu nhập dựa trên số phiếu nhập
-        phieu_nhap = get_object_or_404(PhieuNhap, so_phieu_nhap=so_phieu_nhap)
-        items_ct_phieu_nhap = ctPhieuNhap.objects.filter(phieu_nhap=phieu_nhap)
     
     return render(request, 'phieu_nhap_kho.html', {
-        'items_danh_muc':items_danh_muc,
-        'items_ct_phieu_nhap':items_ct_phieu_nhap,
         'months':months, 'years':years,
+        'items_danh_muc':items_danh_muc,
         'items_phieu_nhap':items_phieu_nhap,
+        'items_ct_phieu_nhap':items_ct_phieu_nhap,
         'form':form
         })
 
-    
-def nhap_thuoc(request):
+def xem_phieu_nhap(request,id):
+    return render(request,'xem_phieu_nhap')
+        
+
+def them_phieu_nhap(request):
     if request.method == "POST":
         ngay_nhap = request.POST.get('ngay_nhap')
         so_phieu_nhap = request.POST.get('so_phieu_nhap')
@@ -87,8 +79,25 @@ def nhap_thuoc(request):
     items_danh_muc = Thuoc.objects.all()
     return render(request, 'danh_sach_phieu_nhap', {'items_danh_muc': items_danh_muc})
 
-def sua_ct_phieu_nhap(request, id):
-    ct_phieu_nhap = get_object_or_404(ctPhieuNhap, id=id)
+def xoa_phieu_nhap(request, id):
+    phieu_nhap = get_object_or_404(PhieuNhap, id=id)
+    ct_phieu_nhap = ctPhieuNhap.objects.filter(phieu_nhap=phieu_nhap)
+    
+    if request == 'POST':
+        for ctpn in ct_phieu_nhap:
+            item_kho = get_object_or_404(Kho, thuoc=ct_phieu_nhap.thuoc)
+            item_kho.so_luong_ton -= ctpn.so_luong_nhap
+            item_kho.save()
+            ctpn.delete()
+            
+    phieu_nhap.delete()
+    messages.success(request,'Xoá phiếu nhập thành công')
+    return redirect('danh_sach_phieu_nhap')
+
+
+def sua_phieu_nhap(request, id):
+    phieu_nhap = get_object_or_404(PhieuNhap, id=id)
+    ct_phieu_nhap = ctPhieuNhap.objects.filter(phieu_nhap=phieu_nhap)
     item_kho = get_object_or_404(Kho, thuoc=ct_phieu_nhap.thuoc)
     
     if request.method == 'POST':
@@ -104,10 +113,7 @@ def sua_ct_phieu_nhap(request, id):
         messages.success(request,'Sửa phiếu nhập thành công!')
         items_danh_muc = Thuoc.objects.all()
         
-        return redirect('danh_sach_phieu_nhap')
-    
-        
-        
+    return redirect('danh_sach_phieu_nhap')
 
 def xoa_ct_phieu_nhap(request,id):
     ct_phieu_nhap = get_object_or_404(ctPhieuNhap,id=id)

@@ -37,6 +37,34 @@ Quản lý bệnh nhân
         </button>
     </div>
 
+    <!--Thông báo-->
+    {% if messages %}
+        <div class = 'alert alert-success' id='message-alert'>
+            <ul class ='mb-0'>
+                {% for item in messages %}
+                    <li>{{item}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <script>
+        // Chờ cho đến khi DOM được tải hoàn toàn
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tìm phần tử thông báo
+            var alert = document.getElementById("message-alert");
+            // Nếu tồn tại thông báo, thiết lập timeout để ẩn thông báo sau 3 giây
+            if (alert) {
+                setTimeout(function() {
+                    alert.style.transition = "opacity 0.5s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(function() {
+                        alert.style.display = "none";
+                    }, 500); // 500 milliseconds = 0.5 seconds
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+        });
+    </script>
+
     <!-- Danh sách bệnh nhân -->
     <table class="table table-bordered">
         <thead>
@@ -57,7 +85,7 @@ Quản lý bệnh nhân
                 <td>{{ bn.get_khoa_display }}</td>
                 <td align='center'>
                     <button type="button" class="btn btn-info btn-md" data-bs-toggle="modal" data-bs-target="#suaBenhNhanModal{{ bn.id }}">Sửa</button>
-                    <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md">Xoá</a>
+                    <a href="{% url 'xoa_benh_nhan' bn.id %}" class="btn btn-danger btn-md" onclick="return confirm('Bạn có chắc muốn xoá bệnh nhân {{bn.ho_ten}} không?')">Xoá</a>
                 </td>
             </tr>
             {% empty %}

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 import json
 from .models import BenhNhan
 from .forms import BenhNhanForm
@@ -36,6 +37,7 @@ def them_benh_nhan(request):
     form = BenhNhanForm(data)
     if form.is_valid():
         form.save()
+        messages.success(request, "Thêm bệnh nhân thành công!")
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'errors': form.errors})
@@ -46,14 +48,15 @@ def sua_benh_nhan(request, id):
         form = BenhNhanForm(request.POST, instance=benh_nhan)
         if form.is_valid():
             form.save()
+            messages.success(request, "Sửa thông tin bệnh nhân thành công!")
     else:
         form = BenhNhanForm(instance=benh_nhan)
     return redirect('danh_sach_benh_nhan')
 
 def xoa_benh_nhan(request, id):
     benh_nhan = get_object_or_404(BenhNhan, id=id)
-    if request.method == 'POST':
-        benh_nhan.delete()
-        return redirect('danh_sach_benh_nhan')
+    benh_nhan.delete()
+    messages.success(request, "Xoá bệnh nhân thành công!")
+    return redirect('danh_sach_benh_nhan')
     
 

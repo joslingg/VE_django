@@ -1,0 +1,90 @@
+<!-- Modal sửa -->
+{% for phieu_nhap in items_phieu_nhap %}
+<div class="modal fade" id="suaPhieuNhapModal{{phieu_nhap.id}}" tabindex="-1" aria-labelledby="suaPhieuNhapLabel{{phieu_nhap.id}}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suaPhieuNhapModal{{phieu_nhap.id}}">Phiếu nhập kho</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'sua_phieu_nhap' phieu_nhap.id %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="so_phieu_nhap">Số phiếu nhập</label>
+                        <input type="text" class="form-control" id="so_phieu_nhap" name="so_phieu_nhap" value="{{phieu_nhap.so_phieu_nhap}}" readonly>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ngay_nhap">Ngày nhập</label>
+                        <input readonly type="date" class="form-control" id="ngay_nhap" name="ngay_nhap" value="{{phieu_nhap.ngay_nhap|date:"Y-m-d"}}" required>
+                    </div>
+                    
+                    <div id="drug-input-container-{{phieu_nhap.id}}">
+                        {% for ct_phieu_nhap in items_ct_phieu_nhap %}
+                            {% if ct_phieu_nhap.phieu_nhap.so_phieu_nhap == phieu_nhap.so_phieu_nhap %}
+                                <div class="drug-input-group mb-3">
+                                    <div class="form-group mb-3">
+                                        <label for="ten_thuoc">Tên thuốc <span class="drug-number">1</span></label>
+                                        <select class="form-control" id="ten_thuoc" name="ten_thuoc">
+                                            <option value="">--- Chọn thuốc ---</option>
+                                            {% for thuoc in items_danh_muc %}
+                                                <option value="{{ thuoc.id }}" {% if thuoc.id == ct_phieu_nhap.thuoc.id %}selected{% endif %}>{{ thuoc.ten_thuoc }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="so_luong_nhap">Số lượng nhập</label>
+                                        <input type="number" class="form-control" id="so_luong_nhap" name="so_luong_nhap" value="{{ct_phieu_nhap.so_luong_nhap}}" required>
+                                    </div>
+                                    <button type="button" class="btn btn-danger remove-drug" style="display: {% if forloop.counter > 1 %}inline{% else %}none{% endif %};;">Xoá</button>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block mt-3">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<script>
+    $(document).ready(function() {
+        $('.add-drug').on('click', function() {
+            var containerId = $(this).data('container-id');
+            var drugCount = $('#' + containerId + ' .drug-input-group').length + 1;
+            var newDrugInputGroup = $('#' + containerId + ' .drug-input-group:first').clone();
+            newDrugInputGroup.find('input').val('');
+            newDrugInputGroup.find('select').val('');
+            newDrugInputGroup.find('.drug-number').text(drugCount);
+            $('#' + containerId).append(newDrugInputGroup);
+            updateRemoveButtons(containerId);
+        });
+
+        $('body').on('click', '.remove-drug', function() {
+            var containerId = $(this).closest('.modal-body').find('.drug-input-group').parent().attr('id');
+            if ($('#' + containerId + ' .drug-input-group').length > 1) {
+                $(this).closest('.drug-input-group').remove();
+                $('#' + containerId + ' .drug-input-group').each(function(index) {
+                    $(this).find('.drug-number').text(index + 1);
+                });
+                updateRemoveButtons(containerId);
+            }
+        });
+
+        function updateRemoveButtons(containerId) {
+            var drugGroups = $('#' + containerId + ' .drug-input-group');
+            if (drugGroups.length > 1) {
+                drugGroups.find('.remove-drug').show();
+            } else {
+                drugGroups.find('.remove-drug').hide();
+            }
+        }
+
+        // Initial call to updateRemoveButtons for all containers
+        $('.modal').each(function() {
+            var containerId = $(this).find('.modal-body .drug-input-group').parent().attr('id');
+            updateRemoveButtons(containerId);
+        });
+    });
+</script>

@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.danh_sach_phieu_nhap, name='danh_sach_phieu_nhap'),
-    path('nhap_thuoc/', views.nhap_thuoc, name='nhap_thuoc'),
-    path('sua_ct_phieu_nhap/<int:id>/', views.sua_ct_phieu_nhap, name='sua_ct_phieu_nhap'),
-    path('xoa_ct_phieu_nhap/<int:id>/',views.xoa_ct_phieu_nhap,name='xoa_ct_phieu_nhap'),
+    path('them_phieu_nhap/', views.them_phieu_nhap, name='them_phieu_nhap'),
+    path('xem_phieu_nhap/<int:id>/', views.xem_phieu_nhap, name='xem_phieu_nhap'),
+    path('sua_phieu_nhap/<int:id>/', views.sua_phieu_nhap, name='sua_phieu_nhap'),
+    path('xoa_phieu_nhap/<int:id>/', views.xoa_phieu_nhap, name='xoa_phieu_nhap'),
 ]

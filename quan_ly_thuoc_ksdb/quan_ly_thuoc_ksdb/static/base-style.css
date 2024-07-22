@@ -33,7 +33,7 @@ a:focus {
 .sidebar ul li.active>a,
 a[aria-expanded="true"] {
     color: #fff;
-    background: #224f33;
+    background: #38754f;
 }
 
 a[data-toggle="collapse"] {
@@ -63,6 +63,12 @@ ul ul a {
 .sidebar ul li a:hover{
     background-color: #fff;
     color: #38754f;
+}
+
+.sidebar ul li a.active {
+    background-color: #224f33;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .content {
